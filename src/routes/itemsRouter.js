@@ -1,15 +1,12 @@
 import express from "express";
-import { getAllItens } from "../controllers/itemsController.js";
+import { getAllItens, getCategoryItens } from "../controllers/itemsController.js";
 
 const itemsRouter = express.Router();
 
 itemsRouter.get("/soundbytes/itens/", getAllItens);
 
+itemsRouter.get("/soundbytes/category/:name", getCategoryItens);
 
-//Essa Rota é de teste (deletar quando enviar!)
-itemsRouter.get("/hello", (req, res) => {
-  res.send("Hello!");
-});
 
 
 
