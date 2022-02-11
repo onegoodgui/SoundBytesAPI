@@ -6,7 +6,7 @@ import verifyUserExistence from "../middlewares/verifyMiddleware.js";
 
 const authRouter = express.Router();
 
-authRouter.post('/auth/sign-up', authSchemaMiddleware, verifyUserExistence, SignUp);
-authRouter.post('/auth/sign-in', SignIn);
+authRouter.post('/soundbytes/auth/sign-up', authSchemaMiddleware, verifyUserExistence, SignUp);
+authRouter.post('/soundbytes/auth/sign-in', SignIn);
 
 export default authRouter;
