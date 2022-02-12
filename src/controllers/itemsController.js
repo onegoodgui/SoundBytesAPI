@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import db from '../db.js';
 
 export async function getAllItens(req, res) {
@@ -16,7 +17,7 @@ export async function getAllItens(req, res) {
 
 export async function getCategoryItens(req, res) {
 
-  const { name } = req.params
+  const { name } = req.params.itemId
   try {
     if (name === "Todos") {
       const itens = await db.collection("itens").find({}).toArray()
@@ -34,4 +35,19 @@ export async function getCategoryItens(req, res) {
     res.sendStatus(500)
   }
 
+}
+
+export async function getItem(req, res){
+
+  const {id} = req.params;
+
+  try{
+    const item = await db.collection('itens').findOne({ _id: ObjectId(id)});
+    console.log(item);
+    res.status(201).send(item);
+  }
+  catch(error){
+    res.status(500).send(error);
+    return
+  }
 }
