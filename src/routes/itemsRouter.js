@@ -3,7 +3,7 @@ import { getAllItens, getCategoryItens, getItem } from "../controllers/itemsCont
 
 const itemsRouter = express.Router();
 
-itemsRouter.get("/soundbytes/itens/", getAllItens);
+itemsRouter.get("/soundbytes/itens", getAllItens);
 
 itemsRouter.get("/soundbytes/category/:name", getCategoryItens);
 
