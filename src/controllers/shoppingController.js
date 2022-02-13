@@ -1,6 +1,34 @@
 import db from "../db.js";
 import { ObjectId } from "mongodb";
 
+
+export async function getCartData(req, res){
+    const user = res.locals.user;
+    console.log(user);
+
+
+    try{
+
+        const itemsQnt = await db.collection('shopping-cart-list').aggregate(
+            [
+                 { "$project": {
+                    "userId": user._id,
+                    "totalQnty": {
+                       "$sum": "$items.qnt"
+                       }
+                    }}
+                 ]
+             ).toArray();
+        
+        res.status(201).send(itemsQnt)
+        return
+    }
+    catch(error){
+        res.status(500).send(error)
+    }
+}
+
+
 export async function addToCart(req, res){
 
     const userId = res.locals.user._id;
