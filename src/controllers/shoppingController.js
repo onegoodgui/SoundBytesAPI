@@ -1,7 +1,6 @@
 import db from "../db.js";
 import { ObjectId } from "mongodb";
 
-
 export async function getShoppingCart(req, res){
     const user = res.locals.user;
     
@@ -88,3 +87,43 @@ export async function addToCart(req, res){
     
 }
 
+
+
+export async function getCartAllItens(req, res) {
+  const user = res.locals.user;
+
+  try {
+
+    const AllItens = await db.collection('shopping-cart-list').findOne({ "userId": user._id })
+    res.status(200).send(AllItens)
+    return
+  }
+  catch (error) {
+    res.status(500).send(error)
+  }
+}
+
+export async function setShoppingCartItens(req, res) {
+
+  const user = res.locals.user;
+  const shoppingCart = req.body;
+
+  let newItens = [...shoppingCart.items]
+
+  try {
+
+    const shoppinglist = await db.collection('shopping-cart-list').findOne({ "userId": user._id })
+    await db.collection('shopping-cart-list').updateOne({ "userId": user._id },
+      {
+        $set: {
+          "items": newItens
+        }
+      }
+    )
+    res.status(201).send(newItens)
+    return
+  }
+  catch (error) {
+    res.status(500).send(error)
+  }
+}
