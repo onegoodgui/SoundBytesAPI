@@ -46,6 +46,7 @@ export async function getCartData(req, res){
 
 export async function addToCart(req, res){
 
+
     const userId = res.locals.user._id;
     const obj = res.locals.obj;
     const qnt = {qnt:req.body.qnt};
