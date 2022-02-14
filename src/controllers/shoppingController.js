@@ -44,6 +44,7 @@ export async function addToCart(req, res) {
     const existentUserShoppingCart = await db.collection('shopping-cart-list').findOne({ userId });
     if (!existentUserShoppingCart) {
       const item = await db.collection('shopping-cart-list').insertOne(purchaseObj);
+      res.send(200)
     }
     else {
       const existentItem = await db.collection('shopping-cart-list').find({ "items.itemId": obj.itemId }).toArray();
