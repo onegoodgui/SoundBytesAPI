@@ -46,24 +46,28 @@ export async function addToCart(req, res) {
       const item = await db.collection('shopping-cart-list').insertOne(purchaseObj);
       res.send(200)
     }
-    else {
-      const existentItem = await db.collection('shopping-cart-list').find({ "items.itemId": obj.itemId }).toArray();
-      if (existentItem.length !== 0) {
-        const a = await db.collection('shopping-cart-list').updateOne(
-          { "userId": userId },
-          { $inc: { "items.$[current].qnt": req.body.qnt } },
-          { arrayFilters: [{ 'current.itemId': obj.itemId }] }
-        )
-        res.send(200)
-      }
-      else {
-        const b = await db.collection('shopping-cart-list').updateOne(
-          { "userId": userId },
-          { $push: { "items": itemObj } }
-        )
-        res.send(200)
-      }
-    }
+    else{
+        const existentItem = await db.collection('shopping-cart-list').findOne({
+            "items.itemId": obj.itemId,
+            "userId": userId
+        })
+        if(existentItem !== null){
+            const a = await db.collection('shopping-cart-list').updateOne(
+                {"userId" : userId},
+                { $inc: { "items.$[current].qnt": req.body.qnt} },
+                { arrayFilters: [{'current.itemId': obj.itemId} ]} 
+            )
+
+            res.status(200).send('OK');
+        }
+        else{
+            const b = await db.collection('shopping-cart-list').updateOne(
+                { "userId": userId},
+                { $push: { "items": itemObj }}
+            )
+            res.status(200).send('OK');
+        }
+    }  
   }
   catch (error) {
     console.log(error)
