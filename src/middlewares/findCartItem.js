@@ -13,7 +13,7 @@ export default async function findCartItem (req, res, next){
             return
         }
 
-        const obj = {itemId, price: item.itemPrice, image: item.itemThumbnail}
+        const obj = {itemId, itemName: item.itemName ,price: item.itemPrice, image: item.itemThumbnail}
         res.locals.obj = obj;
         next()
     }
