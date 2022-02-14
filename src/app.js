@@ -11,5 +11,5 @@ app.use(cors());
 
 app.use(router);
 
-app.listen(process.env.PORT, ()=>{console.log('porta ' + process.env.PORT + ' funcionando')});
+app.listen(process.env.PORT);
 
