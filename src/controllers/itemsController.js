@@ -1,11 +1,37 @@
 import { ObjectId } from 'mongodb';
 import db from '../db.js';
+import { v4 as uuid } from 'uuid';
+import dayjs from 'dayjs';
 
 export async function getAllItens(req, res) {
 
   try {
 
     const itens = await db.collection("itens").find({}).toArray()
+    const token = JSON.stringify({ token: uuid()});
+
+    if(req.cookies.shoppingCart === undefined || req.cookies.shoppingCart === '{}'){
+
+      const shoppingCart = JSON.stringify({items:'empty'});
+      
+      res.cookie('shoppingCart',shoppingCart,{
+        secure: false,
+        Path: '/',
+        encode: String,
+        expires: dayjs().add(500, "minutes").toDate(),
+      });
+
+    }
+   
+
+    res.cookie('token',token,{
+      secure: false,
+      Path: '/',
+      encode: String,
+      expires: dayjs().add(500, "minutes").toDate(),
+    });
+
+
 
     res.send(itens);
 

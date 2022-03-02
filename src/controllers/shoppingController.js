@@ -1,11 +1,21 @@
 import db from "../db.js";
+import dayjs from "dayjs";
+import cookieParser from 'cookie-parser'
 import { ObjectId } from "mongodb";
 
 
 export async function getCartData(req, res) {
   const user = res.locals.user;
-  console.log(user);
 
+  if(req.cookies.user === undefined){
+    if(req.cookies.shoppingCart === '{}'){
+
+      req.cookies.shoppingCart = null;
+    }
+
+    res.send('chegou aqui');
+    return
+  }
 
   try {
 
@@ -28,17 +38,61 @@ export async function getCartData(req, res) {
   catch (error) {
     res.status(500).send(error)
   }
+
 }
 
 
 export async function addToCart(req, res) {
 
-  const userId = res.locals.user._id;
+  
   const obj = res.locals.obj;
   const qnt = { qnt: req.body.qnt };
   const itemObj = { ...obj, ...qnt };
 
-  const purchaseObj = { userId, items: [itemObj] }
+  let purchaseObj = {items: [itemObj] };
+
+  if(req.cookies.user === undefined){
+    
+    let shopCartObj = JSON.parse(req.cookies.shoppingCart);
+
+    if(shopCartObj.items === 'empty'){
+      shopCartObj = purchaseObj;
+    }
+    else{
+      const foundItem = shopCartObj.items.find((item) => { 
+
+      if(item.itemId === req.body.itemId){
+        item.qnt = item.qnt + req.body.qnt;
+        return (true)
+      }
+      });
+      if (!foundItem){
+
+        shopCartObj.items = [...shopCartObj.items, itemObj];
+      }
+  
+    }
+
+
+    let shopCartString = JSON.stringify(shopCartObj);
+
+    res.cookie('shoppingCart',shopCartString,{
+      secure: false,
+      encode: String,
+      Path: '/',
+      expires: dayjs().add(500, "minutes").toDate(),
+      overwrite: true
+    });
+    
+    res.send('chegou aqui');
+    return
+  }
+
+
+
+  
+  const userId = res.locals.user._id;
+  purchaseObj = { userId, items: [itemObj] }
 
   try {
     const existentUserShoppingCart = await db.collection('shopping-cart-list').findOne({ userId });
@@ -75,17 +129,63 @@ export async function addToCart(req, res) {
 
 }
 
+export async function updateCart(req, res){
+
+  const updatedItem = req.body.updatedItem;
+
+  const cookieItems = JSON.parse(req.cookies.shoppingCart);
+  
+  cookieItems.items.filter(item => {
+    if(item.itemId === updatedItem.itemId){
+      item.qnt = updatedItem.qnt;
+    }
+  })
+  
+  let shopCartString = JSON.stringify(cookieItems);
+
+  res.cookie('shoppingCart',shopCartString,{
+    secure: false,
+    encode: String,
+    Path: '/',
+    expires: dayjs().add(500, "minutes").toDate(),
+    overwrite: true
+  });
+
+  res.send('ok');
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export async function getCartAllItens(req, res) {
-  const user = res.locals.user;
+  if(res.locals.user !== undefined){
 
-  try {
-
-    const AllItens = await db.collection('shopping-cart-list').findOne({ "userId": user._id })
-    res.status(200).send(AllItens)
-    return
+    const user = res.locals.user;
+  
+    try {
+  
+      const AllItens = await db.collection('shopping-cart-list').findOne({ "userId": user._id })
+      res.status(200).send(AllItens)
+      return
+    }
+    catch (error) {
+      res.status(500).send(error)
+    }
   }
-  catch (error) {
-    res.status(500).send(error)
+  else{
+    res.send('hi');
   }
 }
 

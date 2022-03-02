@@ -40,3 +40,15 @@ export async function SignIn(req, res) {
       res.sendStatus(401);
     }
   }
+
+export async function noLoginSession(req, res, next){
+
+  const authorization = req.headers.authorization;
+  const token = authorization?.replace("Bearer ", "");
+    if (!token) {
+    return res.sendStatus(401);
+    }
+    else{
+      next()
+    }
+}
